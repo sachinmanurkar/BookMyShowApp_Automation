@@ -1,1 +1,1 @@
-## This Project demonstrate the automation of BookMyShow application
+## Automation of BookMyShow Application using Appium and gradle.
