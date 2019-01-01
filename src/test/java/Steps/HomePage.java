@@ -4,6 +4,8 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.touch.offset.PointOption;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,12 +13,14 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HomePage {
 
 
     private AppiumDriver appiumDriver;
+
 
     @Given("^I launch the book my show App$")
     public void iLaunchBookMyShowApp() throws Throwable {
@@ -27,6 +31,7 @@ public class HomePage {
         capabilities.setCapability("app", System.getProperty("user.dir") + "/app/com.bt.bms_2018-12-07.apk");
         capabilities.setCapability("appPackage", "com.bt.bms");
         capabilities.setCapability("automationName", "UiAutomator2");
+//      capabilities.setCapability("autoWebview", true);
 //      capabilities.setCapability("noReset", "true");
 //      capabilities.setCapability("fullReset", "false");
         appiumDriver = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
@@ -37,12 +42,6 @@ public class HomePage {
     @Then("^Select the language as English$")
     public void selectLanguageAsEnglish() throws Throwable {
         appiumDriver.findElement(By.id("com.bt.bms:id/language_english")).click();
-//        System.out.println("The size is " +values.size());
-//        for(WebElement value :  values){
-//            if(value.getText().contains(language)){
-//                value.click();
-//            }
-//        }
         appiumDriver.findElement(By.id("com.bt.bms:id/bottom_rel_layout")).click();
     }
 
@@ -67,15 +66,10 @@ public class HomePage {
     @And("^I search for \"([^\"]*)\" under search movie$")
     public void iSearchForMovie(String moviename) throws Throwable {
         appiumDriver.findElement(By.id("com.bt.bms:id/search_src_text")).click();
-        appiumDriver.findElement(By.id("com.bt.bms:id/search_src_text")).sendKeys("2.0");
+        appiumDriver.findElement(By.id("com.bt.bms:id/search_src_text")).sendKeys(moviename);
         List<WebElement> elements = appiumDriver.findElements(By.id("com.bt.bms:id/title_container"));
         System.out.println("The size is " + elements.size());
         elements.get(0).click();
-//        for (WebElement element : elements) {
-//            if (element.getText().contains(moviename)) {
-//                element.click();
-//                break;
-//            }
     }
 
     @Then("^Verify the Page is displayed with selected movie name \"([^\"]*)\"$")
@@ -87,27 +81,79 @@ public class HomePage {
     @Then("^Click on Book Tickets Button$")
     public void clickOnBookTicketsButton() throws Throwable {
         appiumDriver.findElement(By.id("com.bt.bms:id/movie_details_activity_lin_bookticket")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        Thread.sleep(3000);
     }
 
     @Then("^Select language Hindi and screentype 3D$")
     public void selectLanguageHindiandFormat3D() throws Throwable {
-//        List<WebElement> element = appiumDriver.findElements(By.xpath("//android.widget.TextView[@text ='3D']"));
-//        System.out.println("Size is " + element.size());
-        //element.get(1).click();
+        appiumDriver.findElement(By.xpath("//android.view.ViewGroup/android.widget.TextView[@text = '3D']")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-        appiumDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-        List<WebElement> elements = appiumDriver.findElements(By.className("android.view.ViewGroup"));
-        String language = "Hindi";
-        String screenType = "3D";
-        WebElement e1 = null;
-        System.out.println("Size of elements: ------- " + elements.size());
+    }
 
-        for (WebElement e : elements) {
-           // if (e.findElement(By.className("android.widget.TextView")).isDisplayed() && e.findElement(By.className("android.widget.TextView")).getText().contains(language)) {
-                e1 = e.findElements(By.className("android.view.ViewGroup")).stream().filter(e2 -> e2.getText().contains(screenType)).findFirst().orElse(null);
+    @Then("^Select the date \"([^\"]*)\"$")
+    public void selectTheDate(int date) throws Throwable {
+        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text = " + date + "]")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+    }
+
+    @Then("^Select the time \"([^\"]*)\"$")
+    public void selectTheMovieTime(int time) throws Throwable {
+        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text = '06:35 PM']")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    }
+
+    @Then("^Accept terms and conditions$")
+    public void acceptorRejectTermsAndConditions() throws Throwable {
+        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text = 'Accept']")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    }
+
+    @Then("Select the number of seats as \"([^\"]*)\"$")
+    public void selectNumberOfSeatsAs(int numofseats) throws Throwable {
+        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text = " + numofseats + "]")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    }
+
+    @Then("^Click on Select Seats$")
+    public void clickOnSelectSeats() throws Throwable {
+        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text = 'Select Seats']")).click();
+        appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    }
+
+    @Then("^Check Wheather it is Webview or native \"([^\"]*)\"$")
+    public void checkWheatherWebOrNative(String cont) throws Throwable {
+        System.out.println("Before Switching context" + appiumDriver.getContext());
+        Set<String> context = appiumDriver.getContextHandles();
+        for (String contextName : context) {
+            System.out.println("Available context" + contextName);
+            if (contextName.contains(cont)) {
+                appiumDriver.context(contextName);
                 break;
             }
-        assert e1 != null;
-        e1.click();
+        }
+        System.out.println("After switching" + appiumDriver.getContext());
+        Thread.sleep(3000);
     }
+
+    @Then("^Tap on the seats$")
+    public void tapONSeats() throws Throwable {
+        new TouchAction(appiumDriver).tap(PointOption.point(372, 862)).perform();
+        Thread.sleep(3000);
+    }
+
+    @Then("^Tap on pay$")
+    public void tapOnPay() throws Throwable {
+        new TouchAction(appiumDriver).tap(PointOption.point(366, 1092)).perform();
+        Thread.sleep(3000);
+    }
+
+    @Then("Click on skip button on seat selection page$")
+    public void clickOnSkipButtonOnSeatSelectionPage() throws Throwable {
+        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text = 'Skip']")).click();
+    }
+
 }
+
